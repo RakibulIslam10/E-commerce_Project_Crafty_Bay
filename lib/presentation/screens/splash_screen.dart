@@ -1,4 +1,4 @@
-import 'package:crafty_bay/presentation/screens/email_verification_screen.dart';
+import 'package:crafty_bay/presentation/screens/main_bottom_nav_screen.dart';
 import 'package:crafty_bay/presentation/widgets/app_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,6 +42,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _moveToHomeScreen() async {
     await Future.delayed(const Duration(seconds: 3));
-    Get.offAll(() => const EmailVerificationScreen());
+    Get.offAll(() => const MainBottomNavScreen());
   }
 }

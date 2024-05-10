@@ -1,3 +1,4 @@
+import 'package:crafty_bay/controller_binder.dart';
 import 'package:crafty_bay/presentation/screens/home_screen.dart';
 import 'package:crafty_bay/presentation/screens/splash_screen.dart';
 import 'package:crafty_bay/presentation/utils/app_colors.dart';
@@ -15,6 +16,7 @@ class _CraftyBayState extends State<CraftyBay> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      initialBinding: ControllerBinder(),
       title: "Crafty Bay",
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(),
