@@ -2,8 +2,6 @@ import 'package:crafty_bay/presentation/state_holder/main_bottom_nav_screen_cont
 import 'package:crafty_bay/presentation/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-
 class WishListScreen extends StatefulWidget {
   const WishListScreen({
     super.key,
