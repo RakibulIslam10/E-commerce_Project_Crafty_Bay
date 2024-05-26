@@ -1,11 +1,14 @@
+import 'package:crafty_bay/presentation/state_holder/home_slider_controller.dart';
 import 'package:crafty_bay/presentation/utils/assets_path.dart';
 import 'package:crafty_bay/presentation/widgets/app_bar_icon_button.dart';
 import 'package:crafty_bay/presentation/widgets/category_item.dart';
+import 'package:crafty_bay/presentation/widgets/circular_progress.dart';
 import 'package:crafty_bay/presentation/widgets/home_carousel_slider.dart';
 import 'package:crafty_bay/presentation/widgets/product_card.dart';
 import 'package:crafty_bay/presentation/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,7 +29,15 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _buildSearchTextField(),
               const SizedBox(height: 16),
-              const HomeCarouselSlider(),
+              GetBuilder<HomeSliderController>(builder: (sliderController) {
+                if (sliderController.inProgress) {
+                  return const SizedBox(
+                      height: 200, child: CircularProgress());
+                }
+                return HomeCarouselSlider(
+                  sliderList: sliderController.sliderList,
+                );
+              }),
               const SizedBox(height: 16),
               SectionHeader(
                 title: "All Category",
@@ -39,24 +50,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: "Popular",
                 onTapSeeAll: () {},
               ),
-
               const SizedBox(height: 10),
               _buildProductListView(),
-               SectionHeader(
+              SectionHeader(
                 title: "Special",
                 onTapSeeAll: () {},
               ),
-
               const SizedBox(height: 10),
               _buildProductListView(),
-               SectionHeader(
+              SectionHeader(
                 title: "New",
                 onTapSeeAll: () {},
               ),
-
               const SizedBox(height: 10),
               _buildProductListView(),
-
             ],
           ),
         ),

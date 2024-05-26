@@ -1,14 +1,18 @@
+import 'package:crafty_bay/data/models/slider_data.dart';
 import 'package:crafty_bay/presentation/screens/cart_list_screen.dart';
 import 'package:crafty_bay/presentation/screens/category_list_screen.dart';
 import 'package:crafty_bay/presentation/screens/home_screen.dart';
 import 'package:crafty_bay/presentation/screens/wish_list_screen.dart';
+import 'package:crafty_bay/presentation/state_holder/home_slider_controller.dart';
 import 'package:crafty_bay/presentation/state_holder/main_bottom_nav_screen_controller.dart';
 import 'package:crafty_bay/presentation/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MainBottomNavScreen extends StatefulWidget {
-  const MainBottomNavScreen({super.key});
+  const MainBottomNavScreen({super.key,});
+
+
 
   @override
   State<MainBottomNavScreen> createState() => _MainBottomNavScreenState();
@@ -24,6 +28,12 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
     const CartListScreen(),
     const WishListScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    Get.find<HomeSliderController>().getSliders();
+  }
 
   @override
   Widget build(BuildContext context) {
