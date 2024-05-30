@@ -3,6 +3,8 @@ import 'package:crafty_bay/presentation/widgets/app_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../state_holder/user_auth_controller.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -14,7 +16,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _moveToHomeScreen();
+    _moveToNextScreen();
+  }
+
+  Future<void> _moveToNextScreen() async {
+    await Future.delayed(const Duration(seconds: 1));
+    await UserAuthController.getUserToken();
+    Get.off(() => const MainBottomNavBarScreen());
   }
 
   @override
@@ -27,21 +35,12 @@ class _SplashScreenState extends State<SplashScreen> {
             AppLogo(),
             Spacer(),
             CircularProgressIndicator(),
-            SizedBox(
-              height: 16,
-            ),
+            SizedBox(height: 16),
             Text('Version 1.0.0'),
-            SizedBox(
-              height: 16,
-            ),
+            SizedBox(height: 16),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _moveToHomeScreen() async {
-    await Future.delayed(const Duration(seconds: 3));
-    Get.offAll(() => const MainBottomNavScreen());
   }
 }

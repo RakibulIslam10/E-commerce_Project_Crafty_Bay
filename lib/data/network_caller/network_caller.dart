@@ -3,67 +3,97 @@ import 'dart:developer';
 
 import 'package:crafty_bay/data/models/network_response.dart';
 import 'package:crafty_bay/presentation/screens/email_verification_screen.dart';
-import 'package:get/get.dart';
+import 'package:crafty_bay/presentation/state_holder/user_auth_controller.dart';
+import 'package:get/get.dart' as getx;
 import 'package:http/http.dart';
 
 class NetworkCaller {
-  static Future<NetworkResponse> getRequest({required String url}) async {
-    final response = await get(Uri.parse(url));
+  static Future<NetworkResponse> getRequest(
+      {required String url, bool fromAuth = false}) async {
     try {
       log(url);
+      log(UserAuthController.accessToken);
+      final Response response = await get(
+        Uri.parse(url),
+        headers: {
+          'accept': 'application/json',
+          'token': UserAuthController.accessToken
+        },
+      );
+      log(response.statusCode.toString());
+      log(response.body.toString());
       if (response.statusCode == 200) {
-        final decodeData = jsonDecode(response.body);
-        log(response.statusCode.toString());
-        log(response.body.toString());
+        final decodedData = jsonDecode(response.body);
         return NetworkResponse(
-            responseData: decodeData,
+            responseCode: response.statusCode,
             isSuccess: true,
-            responseCode: response.statusCode);
+            responseData: decodedData);
       } else if (response.statusCode == 401) {
-        goToSingInScreen();
+        if (!fromAuth) {
+          _goToSignInScreen();
+        }
         return NetworkResponse(
-            isSuccess: false, responseCode: response.statusCode);
+          responseCode: response.statusCode,
+          isSuccess: false,
+        );
       } else {
         return NetworkResponse(
-            isSuccess: false, responseCode: response.statusCode);
+          responseCode: response.statusCode,
+          isSuccess: false,
+        );
       }
     } catch (e) {
       log(e.toString());
       return NetworkResponse(
-          isSuccess: false, responseCode: -1, errorMessage: e.toString());
+          responseCode: -1, isSuccess: false, errorMessage: e.toString());
     }
   }
 
   static Future<NetworkResponse> postRequest(
       {required String url, Map<String, dynamic>? body}) async {
-    final response = await post(Uri.parse(url),
-        headers: {"accept": "application/json"}, body: body);
-    log(response.statusCode.toString());
-    log(response.body.toString());
     try {
       log(url);
+      log(UserAuthController.accessToken);
+      final Response response = await post(Uri.parse(url),
+          headers: {
+            'accept': 'application/json',
+            'token': UserAuthController.accessToken
+          },
+          body: jsonEncode(body));
+      log(response.statusCode.toString());
+      log(response.body.toString());
       if (response.statusCode == 200) {
-        final decodeData = jsonDecode(response.body);
+        final decodedData = jsonDecode(response.body);
         return NetworkResponse(
-            responseData: decodeData,
+            responseCode: response.statusCode,
             isSuccess: true,
-            responseCode: response.statusCode);
+            responseData: decodedData);
       } else if (response.statusCode == 401) {
-        goToSingInScreen();
+        _goToSignInScreen();
         return NetworkResponse(
-            isSuccess: false, responseCode: response.statusCode);
+          responseCode: response.statusCode,
+          isSuccess: false,
+        );
       } else {
         return NetworkResponse(
-            isSuccess: false, responseCode: response.statusCode);
+          responseCode: response.statusCode,
+          isSuccess: false,
+        );
       }
     } catch (e) {
       log(e.toString());
       return NetworkResponse(
-          isSuccess: false, responseCode: -1, errorMessage: e.toString());
+          responseCode: -1, isSuccess: false, errorMessage: e.toString());
     }
   }
 
-  static goToSingInScreen() {
-    Get.to(() => const EmailVerificationScreen());
+  static void _goToSignInScreen() {
+    // Navigator.push(
+    //   CraftyBay.navigationKey.currentState!.context,
+    //   MaterialPageRoute(
+    //     builder: (context) => const EmailVerificationScreen(),
+    //   ),
+    // );
+    getx.Get.to(() => const EmailVerificationScreen());
   }
 }

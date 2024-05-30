@@ -1,4 +1,11 @@
+import 'package:crafty_bay/data/models/category.dart';
+import 'package:crafty_bay/data/models/product.dart';
+import 'package:crafty_bay/presentation/state_holder/category_list_controller.dart';
 import 'package:crafty_bay/presentation/state_holder/home_slider_controller.dart';
+import 'package:crafty_bay/presentation/state_holder/main_bottom_nav_screen_controller.dart';
+import 'package:crafty_bay/presentation/state_holder/new_product_list_controller.dart';
+import 'package:crafty_bay/presentation/state_holder/popular_product_list_controller.dart';
+import 'package:crafty_bay/presentation/state_holder/special_product_list_controller.dart';
 import 'package:crafty_bay/presentation/utils/assets_path.dart';
 import 'package:crafty_bay/presentation/widgets/app_bar_icon_button.dart';
 import 'package:crafty_bay/presentation/widgets/category_item.dart';
@@ -8,7 +15,7 @@ import 'package:crafty_bay/presentation/widgets/product_card.dart';
 import 'package:crafty_bay/presentation/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,13 +25,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchTEController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               _buildSearchTextField(),
@@ -32,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
               GetBuilder<HomeSliderController>(builder: (sliderController) {
                 if (sliderController.inProgress) {
                   return const SizedBox(
-                      height: 200, child: CircularProgress());
+                      height: 200, child: CenteredCircularProgressIndicator());
                 }
                 return HomeCarouselSlider(
                   sliderList: sliderController.sliderList,
@@ -40,30 +49,79 @@ class _HomeScreenState extends State<HomeScreen> {
               }),
               const SizedBox(height: 16),
               SectionHeader(
-                title: "All Category",
-                onTapSeeAll: () {},
+                title: 'All Category',
+                onTapSeeAll: () {
+                  Get.find<MainBottomNavBarController>().selectCategory();
+                },
               ),
               const SizedBox(height: 10),
-              _buildCategoryListView(),
-              const SizedBox(height: 6),
+              GetBuilder<CategoryListController>(
+                  builder: (categoryListController) {
+                    if (categoryListController.inProgress) {
+                      return const SizedBox(
+                          height: 100, child: CenteredCircularProgressIndicator());
+                    }
+
+                    return _buildCategoryListView(
+                        categoryListController.categoryList);
+                  }),
+              const SizedBox(height: 8),
               SectionHeader(
-                title: "Popular",
+                title: 'Popular',
                 onTapSeeAll: () {},
               ),
               const SizedBox(height: 10),
-              _buildProductListView(),
+              GetBuilder<PopularProductListController>(
+                builder: (popularProductListController) {
+                  if (popularProductListController.popularProductInProgress) {
+                    return const SizedBox(
+                      height: 210,
+                      child: CenteredCircularProgressIndicator(),
+                    );
+                  }
+                  return _buildProductListView(
+                    popularProductListController.productList,
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
               SectionHeader(
-                title: "Special",
+                title: 'Special',
                 onTapSeeAll: () {},
               ),
               const SizedBox(height: 10),
-              _buildProductListView(),
+              GetBuilder<SpecialProductListController>(
+                builder: (specialProductListController) {
+                  if (specialProductListController.inProgress) {
+                    return const SizedBox(
+                      height: 210,
+                      child: CenteredCircularProgressIndicator(),
+                    );
+                  }
+                  return _buildProductListView(
+                    specialProductListController.productList,
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
               SectionHeader(
-                title: "New",
+                title: 'New',
                 onTapSeeAll: () {},
               ),
               const SizedBox(height: 10),
-              _buildProductListView(),
+              GetBuilder<NewProductListController>(
+                builder: (newProductListController) {
+                  if (newProductListController.inProgress) {
+                    return const SizedBox(
+                      height: 210,
+                      child: CenteredCircularProgressIndicator(),
+                    );
+                  }
+                  return _buildProductListView(
+                    newProductListController.productList,
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -71,49 +129,40 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryListView() {
-    return SizedBox(
-      height: 120,
-      child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            return const CategoryItem();
-          },
-          separatorBuilder: (context, index) {
-            return const SizedBox(
+  Widget _buildCategoryListView(List<Category> categoryList) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: categoryList.map((e) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CategoryItem(category: e),
+            const SizedBox(
               width: 16,
-            );
-          },
-          itemCount: 8),
+            )
+          ],
+        )).toList(),
+      ),
     );
   }
 
-  Widget _buildProductListView() {
-    return SizedBox(
-      height: 215,
-      child: Expanded(
-        child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              return const ProductCard();
-            },
-            separatorBuilder: (context, index) {
-              return const SizedBox(
-                width: 8,
-              );
-            },
-            itemCount: 8),
+  Widget _buildProductListView(List<Product> productList) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: productList.map((e) => ProductCard(product: e)).toList(),
       ),
     );
   }
 
   Widget _buildSearchTextField() {
     return TextField(
+      controller: _searchTEController,
       decoration: InputDecoration(
-        hintText: "Search",
-        prefixIcon: const Icon(Icons.search),
-        filled: true,
+        hintText: 'Search',
         fillColor: Colors.grey.shade200,
+        filled: true,
+        prefixIcon: const Icon(Icons.search),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide.none,
             borderRadius: BorderRadius.circular(8)),
@@ -142,8 +191,13 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.notifications_active_outlined,
           onTap: () {},
         ),
-        const SizedBox(width: 8),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _searchTEController.dispose();
+    super.dispose();
   }
 }

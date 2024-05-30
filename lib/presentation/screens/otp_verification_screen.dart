@@ -1,6 +1,9 @@
 import 'package:crafty_bay/presentation/screens/complete_profile_screen.dart';
+import 'package:crafty_bay/presentation/state_holder/verify_otp_controller.dart';
 import 'package:crafty_bay/presentation/utils/app_colors.dart';
 import 'package:crafty_bay/presentation/widgets/app_logo.dart';
+import 'package:crafty_bay/presentation/widgets/circular_progress.dart';
+import 'package:crafty_bay/presentation/widgets/snack_message.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -31,19 +34,34 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 const SizedBox(height: 100),
                 const AppLogo(),
                 const SizedBox(height: 16),
-                Text('Enter OTP Code', style: textTheme.titleLarge),
+                Text('Enter OTP Code', style: textTheme.headlineLarge),
                 const SizedBox(height: 4),
                 Text('A 4 digit OTP code has been sent',
-                    style: textTheme.titleSmall),
+                    style: textTheme.headlineSmall),
                 const SizedBox(height: 24),
                 _buildPinField(),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    Get.to(() => const CompleteProfileScreen());
-                  },
-                  child: const Text('Next'),
-                ),
+                GetBuilder<VerifyOtpController>(builder: (verifyOtpController) {
+                  if (verifyOtpController.inProgress) {
+                    return const CenteredCircularProgressIndicator();
+                  }
+
+                  return ElevatedButton(
+                    onPressed: () async {
+                      final result = await verifyOtpController.verifyOtp(
+                          widget.email, _otpTEController.text);
+                      if (result) {
+                        Get.to(() => const CompleteProfileScreen());
+                      } else {
+                        if (mounted) {
+                          showSnackMessage(
+                              context, verifyOtpController.errorMessage);
+                        }
+                      }
+                    },
+                    child: const Text('Next'),
+                  );
+                }),
                 const SizedBox(height: 24),
                 _buildResendCodeMessage(),
                 TextButton(
@@ -69,7 +87,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           TextSpan(text: 'This code will expire in '),
           // TODO: complete this count down
           TextSpan(
-              text: '120s', style: TextStyle(color: AppColors.primaryColor)),
+              text: '100s', style: TextStyle(color: AppColors.primaryColor)),
         ],
       ),
     );

@@ -3,6 +3,9 @@ import 'package:crafty_bay/data/models/slider_data.dart';
 import 'package:crafty_bay/presentation/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
+import 'network_image_widget.dart';
+
+
 class HomeCarouselSlider extends StatefulWidget {
   const HomeCarouselSlider({
     super.key,

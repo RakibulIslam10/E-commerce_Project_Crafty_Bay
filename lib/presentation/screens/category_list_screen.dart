@@ -1,8 +1,9 @@
+import 'package:crafty_bay/presentation/state_holder/category_list_controller.dart';
 import 'package:crafty_bay/presentation/state_holder/main_bottom_nav_screen_controller.dart';
 import 'package:crafty_bay/presentation/widgets/category_item.dart';
+import 'package:crafty_bay/presentation/widgets/circular_progress.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class CategoryListScreen extends StatefulWidget {
   const CategoryListScreen({super.key});
@@ -16,29 +17,44 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvoked: (_) {
         Get.find<MainBottomNavBarController>().backToHome();
       },
       child: Scaffold(
         appBar: AppBar(
-            leading: IconButton(onPressed: (){
+          title: const Text('Category list'),
+          leading: IconButton(
+            onPressed: () {
               Get.find<MainBottomNavBarController>().backToHome();
-            }, icon: const Icon(Icons.arrow_back_ios)),
-          title: const Text("Category List"),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: GridView.builder(
-            itemCount: 15,
-            gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, childAspectRatio: 1.1),
-            itemBuilder: (context, index) {
-              return const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: FittedBox(child: CategoryItem()));
             },
+            icon: const Icon(Icons.arrow_back_ios_sharp),
           ),
         ),
+        body: GetBuilder<CategoryListController>(
+            builder: (categoryListController) {
+              if (categoryListController.inProgress) {
+                return const CenteredCircularProgressIndicator();
+              }
+
+              return RefreshIndicator(
+                onRefresh: categoryListController.getCategoryList,
+                child: GridView.builder(
+                  itemCount: categoryListController.categoryList.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    childAspectRatio: 0.72,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CategoryItem(
+                        category: categoryListController.categoryList[index],
+                      ),
+                    );
+                  },
+                ),
+              );
+            }),
       ),
     );
   }

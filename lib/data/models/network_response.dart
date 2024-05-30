@@ -5,9 +5,9 @@ class NetworkResponse {
   final bool isSuccess;
 
   NetworkResponse({
-    required this.isSuccess,
     required this.responseCode,
-    this.responseData,
+    required this.isSuccess,
     this.errorMessage = 'Something went wrong',
+    this.responseData,
   });
 }
